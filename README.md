@@ -2,7 +2,7 @@
 
 This is the class repository for the Java Full Stack Upskilling course running July 13 to August 14, 2026.
 
-_**You will not be able to access this repository from you work computers.**_
+_**You will not be able to access this repository from your BoA work computers.**_
 
 However, all the slides and labs will also be distributed to you directly
 through your training coordinator.
