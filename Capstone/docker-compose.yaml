@@ -1,0 +1,39 @@
+services:
+  oracle:
+    image: gvenzl/oracle-xe:21-slim    # same image as the labs (Lab 3.0 Version B)
+    container_name: capstone-oracle
+    ports:
+      - "1522:1521"                    # host 1522 -> container 1521; 1521 is already in use on the VM
+    environment:
+      ORACLE_PASSWORD: password        # SYS / SYSTEM password (same as the labs)
+      APP_USER: labuser                # same credentials the labs used
+      APP_USER_PASSWORD: labpass123
+    volumes:
+      - capstone-oracle-data:/opt/oracle/oradata   # data persists across container removal
+      - ./db:/container-entrypoint-initdb.d        # *.sql here run on FIRST boot only
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: capstone-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+volumes:
+  capstone-oracle-data:
